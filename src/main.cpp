@@ -1,9 +1,11 @@
 #include <cstdint>
+#include <vector>
 #include <iostream>
 #include <matcha/order.hpp>
+#include <matcha/price_level.hpp>
+#include <matcha/order_book.hpp>
 
-int main() {
-    Order order;
+void takeOrder(Order &order) {
     std::cout << "Enter order id::";
     std::cin >> order.id;
     std::cout << "Enter order side(0/1)::";
@@ -17,5 +19,18 @@ int main() {
     std::cin >> order.price;
     std::cout << "Enter order quantity::";
     std::cin >> order.qty;
+}
+
+int main() {
+    OrderBook book;
+    std::cout << "Enter nummber of orders: ";
+    int n;
+    std::cin >> n;
+    std::vector<Order> orders(n);
+    for(size_t i = 0; i < n; i++) {
+        takeOrder(orders[i]);
+        book.insertOrder(&orders[i]);
+    }
+    book.displayBook();
     return 0;
 }

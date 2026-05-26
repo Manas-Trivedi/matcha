@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <vector>
 #include <iostream>
 #include <matcha/order.hpp>
 #include <matcha/price_level.hpp>
@@ -18,4 +19,13 @@ bool PriceLevel::removeOrder(uint64_t orderId) {
         }
     }
     return false;
+}
+
+void PriceLevel::displayLevel() {
+    std::cout << " [ " << price << " ]  -> ";
+    for(size_t i = 0; i < orderQueue.size(); i++) {
+        std::cout << "( " << orderQueue[i]->id << ", " << orderQueue[i]->qty << " )";
+        if(i != orderQueue.size() - 1) std::cout << ", ";
+        else std::cout << "\n";
+    }
 }
