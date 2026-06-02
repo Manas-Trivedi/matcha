@@ -10,5 +10,7 @@ class PriceLevel {
     PriceLevel(uint64_t p) : price( p ) {}
     void addOrder(Order*);
     bool removeOrder(uint64_t);
+    void fillOrder(Order*);
+    bool empty();
     void displayLevel();
 };
