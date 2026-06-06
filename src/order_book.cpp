@@ -20,6 +20,18 @@ void OrderBook::matchOrder(Order *order) {
             asks.erase(key);
             emptyLevels.pop();
         }
+    } else {
+        auto it = bids.rbegin();
+        while(it != bids.rend() && it->first >= order->price && order->qty > 0) {
+            it->second.fillOrder(order);
+            if(it->second.empty()) emptyLevels.push(it->first);
+            it++;
+        }
+        while(!emptyLevels.empty()) {
+            uint64_t key = emptyLevels.top();
+            bids.erase(key);
+            emptyLevels.pop();
+        }
     }
 }
 
