@@ -24,7 +24,7 @@ PriceLevel
 Order
 ├── id
 ├── side
-├── type
+├── order_type
 ├── price
 └── qty
 
@@ -41,7 +41,7 @@ Order
 - Cancel orders
 - Arena allocator
 - Intrusive FIFO linked lists
-- Intrusive RB-tree / dense price ladder exploration
+- Intrusive RB-tree
 - Binary wire protocol
 - TCP server
 - Benchmarking
