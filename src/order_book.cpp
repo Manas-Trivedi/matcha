@@ -8,9 +8,17 @@
 
 void OrderBook::matchOrder(Order *order) {
     std::stack<uint64_t> emptyLevels;
+    uint64_t price;
+    if(order->order_type == OrderType::LIMIT) {
+        price = order->price;
+    }
+    else if(order->order_type == OrderType::MARKET){
+        if(order->side == Side::BUY) price = UINT64_MAX;
+        else price = 0;
+    }
     if(order->side == Side::BUY) {
         auto it = asks.begin();
-        while(it != asks.end() && it->first <= order->price && order->qty > 0) {
+        while(it != asks.end() && it->first <= price && order->qty > 0) {
             it->second.fillOrder(order);
             if(it->second.empty()) emptyLevels.push(it->first);
             it++;
@@ -22,7 +30,7 @@ void OrderBook::matchOrder(Order *order) {
         }
     } else {
         auto it = bids.rbegin();
-        while(it != bids.rend() && it->first >= order->price && order->qty > 0) {
+        while(it != bids.rend() && it->first >= price && order->qty > 0) {
             it->second.fillOrder(order);
             if(it->second.empty()) emptyLevels.push(it->first);
             it++;
@@ -40,8 +48,8 @@ void OrderBook::insertOrder(Order *order) {
         return;
     }
 
-    matchOrder(order);
-    if(order->qty == 0) return;
+    if(order->order_type != OrderType::CANCEL)matchOrder(order);
+    if(order->qty == 0 || order->order_type == OrderType::MARKET) return;
     uint64_t price = order->price;
     if(order->side == Side::BUY) {
         if(bids.find(price) == bids.end()) {
