@@ -5,6 +5,7 @@ Matcha is a single-instrument order matching engine written in C++23. It impleme
 ## Features
 
 - buy and sell orders [LIMIT / MARKET]
+- Cancel resting orders by id
 - Price priority across levels
 - FIFO priority within each price level
 - Partial fills
@@ -16,13 +17,13 @@ Matcha is a single-instrument order matching engine written in C++23. It impleme
 Supported today:
 
 - Limit and market order matching
+- Cancel-order handling for resting orders (by id)
 - Basic in-memory bid/ask book
+- Order lookup by id for cancellation
 - Displaying the current book state after input is processed
 
 Not yet implemented:
 
-- True cancel-order handling
-- Order lookup by id
 - Persistence or recovery
 - Network or wire protocol support
 - Benchmarking and latency tooling
@@ -48,9 +49,15 @@ Input format for each order:
 
 1. Order id
 2. Order type: `0 = LIMIT`, `1 = MARKET`, `2 = CANCEL`
-3. Order side: `0 = BUY`, `1 = SELL` if the order is not a cancel
-4. Price: required for limit orders
-5. Quantity
+3. Order side: `0 = BUY`, `1 = SELL` (required for non-cancel orders)
+4. Price (required for limit orders only)
+5. Quantity (required for non-cancel orders)
+
+Cancel order input notes:
+
+- A cancel request uses the target order id and `order type = 2`.
+- For cancel requests, side/price/quantity are not read by the CLI.
+- Only resting orders currently in the book can be canceled.
 
 ## Matching Rules
 
@@ -59,6 +66,7 @@ Input format for each order:
 - Orders at the same price level are matched in FIFO order.
 - A market order consumes available liquidity and never rests in the book.
 - A limit order rests in the book only if it is not fully filled.
+- A cancel request removes the resting order from its price level and lookup map.
 
 ## Project Layout
 
@@ -74,6 +82,7 @@ Input format for each order:
 OrderBook
 ├── bids : std::map<uint64_t, PriceLevel>
 ├── asks : std::map<uint64_t, PriceLevel>
+└── order_lookup : std::unordered_map<uint64_t, Order*>
 
 PriceLevel
 ├── price
@@ -88,8 +97,6 @@ Order
 
 ## Planned Improvements
 
-- Cancel-order support
-- Order lookup by id
 - Arena allocator
 - Intrusive FIFO linked lists
 - Intrusive RB-tree
