@@ -6,6 +6,14 @@
 #include <matcha/price_level.hpp>
 #include <matcha/order_book.hpp>
 
+void OrderBook::drain_filled_orders(std::queue<uint64_t> &matched_orders) {
+    while(!matched_orders.empty()) {
+        uint64_t id = matched_orders.front();
+        matched_orders.pop();
+        order_lookup.erase(id);
+    }
+}
+
 void OrderBook::cancel_order(uint64_t order_id) {
     if(!order_lookup.count(order_id)) return;
     Order *order = order_lookup[order_id];
@@ -34,7 +42,8 @@ void OrderBook::match_order(Order *order) {
     if(order->side == Side::BUY) {
         auto it = asks.begin();
         while(it != asks.end() && it->first <= price && order->qty > 0) {
-            it->second.fill_order(order);
+            std::queue<uint64_t> matched_orders = it->second.fill_order(order);
+            drain_filled_orders(matched_orders);
             if(it->second.empty()) emptyLevels.push(it->first);
             it++;
         }
@@ -46,7 +55,8 @@ void OrderBook::match_order(Order *order) {
     } else {
         auto it = bids.rbegin();
         while(it != bids.rend() && it->first >= price && order->qty > 0) {
-            it->second.fill_order(order);
+            std::queue<uint64_t> matched_orders = it->second.fill_order(order);
+            drain_filled_orders(matched_orders);
             if(it->second.empty()) emptyLevels.push(it->first);
             it++;
         }

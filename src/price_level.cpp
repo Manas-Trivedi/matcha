@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <stack>
+#include <queue>
 #include <vector>
 #include <iostream>
 #include <matcha/order.hpp>
@@ -9,21 +10,26 @@ bool PriceLevel::empty() {
     return order_queue.empty();
 }
 
-void PriceLevel::fill_order(Order *order) {
-    std::stack<size_t> filledOrders;
+std::queue<uint64_t> PriceLevel::fill_order(Order *order) {
+    std::stack<size_t> filled_orders;
+    std::queue<uint64_t> matched_orders;
     for(size_t i = 0; i < order_queue.size(); i++) {
         if(order->qty == 0) break;
-        if(order_queue[i]->qty == 0) continue;
         uint64_t filledQty = std::min(order->qty, order_queue[i]->qty);
         order->qty -= filledQty;
         order_queue[i]->qty -= filledQty;
-        if(order_queue[i]->qty == 0) filledOrders.push(i);
+        if(order_queue[i]->qty == 0) {
+            uint64_t order_id = order_queue[i]->id;
+            matched_orders.push(order_id);
+            filled_orders.push(i);
+        }
     }
-    while(!filledOrders.empty()) {
-        int idx = filledOrders.top();
+    while(!filled_orders.empty()) {
+        size_t idx = filled_orders.top();
         order_queue.erase(order_queue.begin() + idx);
-        filledOrders.pop();
+        filled_orders.pop();
     }
+    return matched_orders;
 }
 
 void PriceLevel::add_order(Order *order) {

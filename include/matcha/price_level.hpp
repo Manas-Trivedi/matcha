@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <queue>
 #include <vector>
 #include <matcha/order.hpp>
 
@@ -10,7 +11,7 @@ class PriceLevel {
     PriceLevel(uint64_t p) : price( p ) {}
     void add_order(Order*);
     bool remove_order(uint64_t);
-    void fill_order(Order*);
+    std::queue<uint64_t> fill_order(Order*);
     bool empty();
     void display_level();
 };
