@@ -64,6 +64,7 @@ void OrderBook::insert_order(Order *order) {
     }
 
     if(order->order_type == OrderType::CANCEL) return cancel_order(order->id);
+    match_order(order);
     if(order->qty == 0 || order->order_type == OrderType::MARKET) return;
     order_lookup[order->id] = order;
     uint64_t price = order->price;
