@@ -34,8 +34,8 @@ int main() {
     std::vector<Order> orders(n);
     for(size_t i = 0; i < n; i++) {
         takeOrder(orders[i]);
-        book.insertOrder(&orders[i]);
+        book.insert_order(&orders[i]);
     }
-    book.displayBook();
+    book.display_book();
     return 0;
 }

@@ -6,48 +6,48 @@
 #include <matcha/price_level.hpp>
 
 bool PriceLevel::empty() {
-    return orderQueue.empty();
+    return order_queue.empty();
 }
 
-void PriceLevel::fillOrder(Order *order) {
+void PriceLevel::fill_order(Order *order) {
     std::stack<size_t> filledOrders;
-    for(size_t i = 0; i < orderQueue.size(); i++) {
+    for(size_t i = 0; i < order_queue.size(); i++) {
         if(order->qty == 0) break;
-        if(orderQueue[i]->qty == 0) continue;
-        uint64_t filledQty = std::min(order->qty, orderQueue[i]->qty);
+        if(order_queue[i]->qty == 0) continue;
+        uint64_t filledQty = std::min(order->qty, order_queue[i]->qty);
         order->qty -= filledQty;
-        orderQueue[i]->qty -= filledQty;
-        if(orderQueue[i]->qty == 0) filledOrders.push(i);
+        order_queue[i]->qty -= filledQty;
+        if(order_queue[i]->qty == 0) filledOrders.push(i);
     }
     while(!filledOrders.empty()) {
         int idx = filledOrders.top();
-        orderQueue.erase(orderQueue.begin() + idx);
+        order_queue.erase(order_queue.begin() + idx);
         filledOrders.pop();
     }
 }
 
-void PriceLevel::addOrder(Order *order) {
+void PriceLevel::add_order(Order *order) {
     if(order->price != price) {
         return;
     }
-    orderQueue.push_back(order);
+    order_queue.push_back(order);
 }
 
-bool PriceLevel::removeOrder(uint64_t orderId) {
-    for(size_t i = 0; i < orderQueue.size(); i++) {
-        if(orderQueue[i]->id == orderId) {
-            orderQueue.erase(orderQueue.begin() + i);
+bool PriceLevel::remove_order(uint64_t orderId) {
+    for(size_t i = 0; i < order_queue.size(); i++) {
+        if(order_queue[i]->id == orderId) {
+            order_queue.erase(order_queue.begin() + i);
             return true;
         }
     }
     return false;
 }
 
-void PriceLevel::displayLevel() {
+void PriceLevel::display_level() {
     std::cout << " [ " << price << " ]  -> ";
-    for(size_t i = 0; i < orderQueue.size(); i++) {
-        std::cout << "( " << orderQueue[i]->qty << ", " << orderQueue[i]->id << " )";
-        if(i != orderQueue.size() - 1) std::cout << ", ";
+    for(size_t i = 0; i < order_queue.size(); i++) {
+        std::cout << "( " << order_queue[i]->qty << ", " << order_queue[i]->id << " )";
+        if(i != order_queue.size() - 1) std::cout << ", ";
     }
     std::cout << "\n";
 }

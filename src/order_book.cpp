@@ -6,7 +6,22 @@
 #include <matcha/price_level.hpp>
 #include <matcha/order_book.hpp>
 
-void OrderBook::matchOrder(Order *order) {
+void OrderBook::cancel_order(uint64_t order_id) {
+    if(!order_lookup.count(order_id)) return;
+    Order *order = order_lookup[order_id];
+    Side side = order->side;
+    uint64_t price = order->price;
+    if(side == Side::BUY) {
+        bids.at(price).remove_order(order_id);
+        if(bids.at(price).empty()) bids.erase(price);
+    } else {
+        asks.at(price).remove_order(order_id);
+        if(asks.at(price).empty()) asks.erase(price);
+    }
+    order_lookup.erase(order_id);
+}
+
+void OrderBook::match_order(Order *order) {
     std::stack<uint64_t> emptyLevels;
     uint64_t price;
     if(order->order_type == OrderType::LIMIT) {
@@ -19,7 +34,7 @@ void OrderBook::matchOrder(Order *order) {
     if(order->side == Side::BUY) {
         auto it = asks.begin();
         while(it != asks.end() && it->first <= price && order->qty > 0) {
-            it->second.fillOrder(order);
+            it->second.fill_order(order);
             if(it->second.empty()) emptyLevels.push(it->first);
             it++;
         }
@@ -31,7 +46,7 @@ void OrderBook::matchOrder(Order *order) {
     } else {
         auto it = bids.rbegin();
         while(it != bids.rend() && it->first >= price && order->qty > 0) {
-            it->second.fillOrder(order);
+            it->second.fill_order(order);
             if(it->second.empty()) emptyLevels.push(it->first);
             it++;
         }
@@ -43,37 +58,38 @@ void OrderBook::matchOrder(Order *order) {
     }
 }
 
-void OrderBook::insertOrder(Order *order) {
+void OrderBook::insert_order(Order *order) {
     if(!order) {
         return;
     }
 
-    if(order->order_type != OrderType::CANCEL)matchOrder(order);
+    if(order->order_type == OrderType::CANCEL) return cancel_order(order->id);
     if(order->qty == 0 || order->order_type == OrderType::MARKET) return;
+    order_lookup[order->id] = order;
     uint64_t price = order->price;
     if(order->side == Side::BUY) {
         if(bids.find(price) == bids.end()) {
             bids.insert({price, PriceLevel(price)});
         }
-        bids.at(price).addOrder(order);
+        bids.at(price).add_order(order);
     } else {
         if(asks.find(price) == asks.end()) {
             asks.insert({price, PriceLevel(price)});
         }
-        asks.at(price).addOrder(order);
+        asks.at(price).add_order(order);
     }
 }
 
-void OrderBook::displayBook() {
+void OrderBook::display_book() {
      std::cout << " [ price ]  -> ";
         std::cout << "( qty, id )";
     std::cout << "\n";
     std::cout << "BIDS::\n";
     for(auto &it: bids) {
-        it.second.displayLevel();
+        it.second.display_level();
     }
     std::cout << "ASKS::\n";
     for(auto &it: asks) {
-        it.second.displayLevel();
+        it.second.display_level();
     }
 }
