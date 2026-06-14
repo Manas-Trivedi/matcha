@@ -5,7 +5,7 @@
 #include <matcha/price_level.hpp>
 #include <matcha/order_book.hpp>
 
-void takeOrder(Order &order) {
+void take_order(Order &order) {
     std::cout << "Enter order id::";
     std::cin >> order.id;
     uint64_t order_type;
@@ -27,14 +27,14 @@ void takeOrder(Order &order) {
 }
 
 int main() {
-    OrderBook book;
     std::cout << "Enter nummber of orders: ";
-    int n;
+    size_t n;
     std::cin >> n;
-    std::vector<Order> orders(n);
+    OrderBook book(n);
     for(size_t i = 0; i < n; i++) {
-        takeOrder(orders[i]);
-        book.insert_order(&orders[i]);
+        Order order;
+        take_order(order);
+        book.insert_order(order);
     }
     book.display_book();
     return 0;

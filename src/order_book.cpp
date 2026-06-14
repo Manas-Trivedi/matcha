@@ -68,26 +68,25 @@ void OrderBook::match_order(Order *order) {
     }
 }
 
-void OrderBook::insert_order(Order *order) {
-    if(!order) {
-        return;
-    }
+void OrderBook::insert_order(Order &order) {
+    if(order.order_type == OrderType::CANCEL) return cancel_order(order.id);
+    match_order(&order);
+    if(order.qty == 0 || order.order_type == OrderType::MARKET) return;
 
-    if(order->order_type == OrderType::CANCEL) return cancel_order(order->id);
-    match_order(order);
-    if(order->qty == 0 || order->order_type == OrderType::MARKET) return;
-    order_lookup[order->id] = order;
-    uint64_t price = order->price;
-    if(order->side == Side::BUY) {
+    Order *stored = arena.allocate();
+    *stored = order;
+    order_lookup[stored->id] = stored;
+    uint64_t price = stored->price;
+    if(stored->side == Side::BUY) {
         if(bids.find(price) == bids.end()) {
             bids.insert({price, PriceLevel(price)});
         }
-        bids.at(price).add_order(order);
+        bids.at(price).add_order(stored);
     } else {
         if(asks.find(price) == asks.end()) {
             asks.insert({price, PriceLevel(price)});
         }
-        asks.at(price).add_order(order);
+        asks.at(price).add_order(stored);
     }
 }
 
