@@ -9,8 +9,9 @@
 void OrderBook::drain_filled_orders(std::queue<uint64_t> &matched_orders) {
     while(!matched_orders.empty()) {
         uint64_t id = matched_orders.front();
-        matched_orders.pop();
+        arena.deallocate(order_lookup.at(id));
         order_lookup.erase(id);
+        matched_orders.pop();
     }
 }
 
@@ -27,6 +28,7 @@ void OrderBook::cancel_order(uint64_t order_id) {
         if(asks.at(price).empty()) asks.erase(price);
     }
     order_lookup.erase(order_id);
+    arena.deallocate(order);
 }
 
 void OrderBook::match_order(Order *order) {

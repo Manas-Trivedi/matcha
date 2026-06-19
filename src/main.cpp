@@ -27,10 +27,13 @@ void take_order(Order &order) {
 }
 
 int main() {
-    std::cout << "Enter nummber of orders: ";
+    size_t orders;
+    std::cout << "Enter arena size: ";
+    std::cin >> orders;
+    std::cout << "Enter number of orders: ";
     size_t n;
     std::cin >> n;
-    OrderBook book(n);
+    OrderBook book(orders);
     for(size_t i = 0; i < n; i++) {
         Order order;
         take_order(order);
