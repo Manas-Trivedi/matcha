@@ -21,6 +21,7 @@ Supported today:
 - Basic in-memory bid/ask book
 - Order lookup by id for cancellation
 - Displaying the current book state after input is processed
+- Arena allocator: allocate(), deallocate() and free_slot added
 
 Not yet implemented:
 
@@ -97,7 +98,6 @@ Order
 
 ## Planned Improvements
 
-- Arena allocator
 - Intrusive FIFO linked lists
 - Intrusive RB-tree
 - Binary wire protocol
