@@ -6,6 +6,10 @@
 #include <matcha/order.hpp>
 #include <matcha/price_level.hpp>
 
+bool PriceLevel::empty_dll() {
+    return head == nullptr;
+}
+
 bool PriceLevel::empty() {
     return order_queue.empty();
 }
@@ -39,6 +43,19 @@ void PriceLevel::add_order(Order *order) {
     order_queue.push_back(order);
 }
 
+void PriceLevel::add_order_dll(Order *order) {
+    order->prev = nullptr;
+    order->next = nullptr;
+    if(head == nullptr) {
+        head = order;
+        tail = order;
+    } else {
+        order->prev = tail;
+        tail->next = order;
+        tail = order;
+    }
+}
+
 bool PriceLevel::remove_order(uint64_t orderId) {
     for(size_t i = 0; i < order_queue.size(); i++) {
         if(order_queue[i]->id == orderId) {
@@ -47,6 +64,24 @@ bool PriceLevel::remove_order(uint64_t orderId) {
         }
     }
     return false;
+}
+
+void PriceLevel::remove_order_dll(Order *order) {
+    if(order == head && order == tail) {
+        head = nullptr;
+        tail = nullptr;
+    } else if(head == order) {
+        head = order->next;
+        head->prev = nullptr;
+    } else if(tail == order) {
+        tail = order->prev;
+        tail->next = nullptr;
+    } else {
+        order->prev->next = order->next;
+        order->next->prev = order->prev;
+    }
+    order->next = nullptr;
+    order->prev = nullptr;
 }
 
 void PriceLevel::display_level() {

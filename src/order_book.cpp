@@ -80,12 +80,12 @@ void OrderBook::insert_order(Order &order) {
     order_lookup[stored->id] = stored;
     uint64_t price = stored->price;
     if(stored->side == Side::BUY) {
-        if(bids.find(price) == bids.end()) {
+        if(!bids.count(price)) {
             bids.insert({price, PriceLevel(price)});
         }
         bids.at(price).add_order(stored);
     } else {
-        if(asks.find(price) == asks.end()) {
+        if(!asks.count(price)) {
             asks.insert({price, PriceLevel(price)});
         }
         asks.at(price).add_order(stored);
