@@ -21,10 +21,10 @@ void OrderBook::cancel_order(uint64_t order_id) {
     Side side = order->side;
     uint64_t price = order->price;
     if(side == Side::BUY) {
-        bids.at(price).remove_order(order_id);
+        bids.at(price).remove_order(order);
         if(bids.at(price).empty()) bids.erase(price);
     } else {
-        asks.at(price).remove_order(order_id);
+        asks.at(price).remove_order(order);
         if(asks.at(price).empty()) asks.erase(price);
     }
     order_lookup.erase(order_id);

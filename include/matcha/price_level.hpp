@@ -6,19 +6,13 @@
 
 class PriceLevel {
     uint64_t price;
-    std::vector<Order*> order_queue;
     Order *head;
     Order *tail;
     public:
     PriceLevel(uint64_t p) : price( p ), head( nullptr), tail( nullptr ) {}
-    void add_order_dll(Order*);
     void add_order(Order*);
-    void remove_order_dll(Order *);
-    bool remove_order(uint64_t);
-    std::queue<uint64_t> fill_order_dll(Order*);
+    void remove_order(Order *);
     std::queue<uint64_t> fill_order(Order*);
-    bool empty_dll();
     bool empty();
-    void display_level_dll();
     void display_level();
 };
