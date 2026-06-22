@@ -22,6 +22,7 @@ Supported today:
 - Order lookup by id for cancellation
 - Displaying the current book state after input is processed
 - Arena allocator: allocate(), deallocate() and free_slot added
+- Intrusive doubly linked lists for resting orders inside each price level
 
 Not yet implemented:
 
@@ -72,7 +73,7 @@ Cancel order input notes:
 ## Project Layout
 
 - `include/matcha/order.hpp` defines the order model and enums.
-- `include/matcha/price_level.hpp` defines a price level and its FIFO queue.
+- `include/matcha/price_level.hpp` defines a price level and its intrusive doubly linked list.
 - `include/matcha/order_book.hpp` defines the bid/ask book interface.
 - `src/price_level.cpp` implements price-level matching and display logic.
 - `src/order_book.cpp` implements cross-level matching and resting order insertion.
@@ -87,7 +88,7 @@ OrderBook
 
 PriceLevel
 ├── price
-└── vector<Order*>
+└── intrusive doubly linked list of resting orders
 
 Order
 ├── id
@@ -98,7 +99,6 @@ Order
 
 ## Planned Improvements
 
-- Intrusive FIFO linked lists
 - Intrusive RB-tree
 - Binary wire protocol
 - TCP server
