@@ -36,6 +36,25 @@ std::queue<uint64_t> PriceLevel::fill_order(Order *order) {
     return matched_orders;
 }
 
+std::queue<uint64_t> PriceLevel::fill_order_dll(Order *order) {
+    std::queue<uint64_t> matched_orders;
+    Order *tmp = head;
+    while(tmp && order->qty > 0) {
+        uint64_t filledQty = std::min(order->qty, tmp->qty);
+        order->qty -= filledQty;
+        tmp->qty -= filledQty;
+        if(tmp->qty == 0) {
+            Order *delOrder = tmp;
+            tmp = tmp->next;
+            matched_orders.push(delOrder->id);
+            remove_order_dll(delOrder);
+            continue;
+        }
+        tmp = tmp->next;
+    }
+    return matched_orders;
+}
+
 void PriceLevel::add_order(Order *order) {
     if(order->price != price) {
         return;
@@ -89,6 +108,17 @@ void PriceLevel::display_level() {
     for(size_t i = 0; i < order_queue.size(); i++) {
         std::cout << "( " << order_queue[i]->qty << ", " << order_queue[i]->id << " )";
         if(i != order_queue.size() - 1) std::cout << ", ";
+    }
+    std::cout << "\n";
+}
+
+void PriceLevel::display_level_dll() {
+    std::cout << " [ " << price << " ]  -> ";
+    Order *tmp = head;
+    while(tmp) {
+        std::cout << "( " << tmp->qty << ", " << tmp->id << " )";
+        if(tmp->next) std::cout << ", ";
+        tmp = tmp->next;
     }
     std::cout << "\n";
 }
