@@ -17,6 +17,7 @@ class OrderBook {
     public:
     OrderBook(size_t n) : arena(n) {}
     bool contains_order(uint64_t order_id) const;
+    const Order* get_order(uint64_t id) const;
     void insert_order(Order &order);
     void cancel_order(uint64_t order_id);
     void display_book();

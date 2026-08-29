@@ -10,6 +10,14 @@ bool OrderBook::contains_order(uint64_t id) const {
     return order_lookup.count(id) > 0;
 }
 
+const Order* OrderBook::get_order(uint64_t id) const {
+    auto it = order_lookup.find(id);
+    if(it != order_lookup.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
 void OrderBook::drain_filled_orders(std::queue<uint64_t> &matched_orders) {
     while(!matched_orders.empty()) {
         uint64_t id = matched_orders.front();

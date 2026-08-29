@@ -28,7 +28,7 @@ TEST(OrderBookTest, MarketOrderNeverRests) {
     EXPECT_FALSE(book.contains_order(1));
 }
 
-TEST(OrderBookTest, CompleteMatchingTest) {
+TEST(OrderBookTest, ComplteMatchingTest) {
     OrderBook book(10);
 
     Order sell_order;
@@ -78,6 +78,7 @@ TEST(OrderBookTest, PartialMatchingTest) {
 
     book.insert_order(buy_order);
 
-    EXPECT_TRUE(book.contains_order(1));
+    int remaining_qty = book.get_order(1)->qty;
+    EXPECT_EQ(remaining_qty, 5);
     EXPECT_FALSE(book.contains_order(2));
 }
