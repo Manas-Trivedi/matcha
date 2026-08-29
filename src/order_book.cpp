@@ -6,6 +6,10 @@
 #include <matcha/price_level.hpp>
 #include <matcha/order_book.hpp>
 
+bool OrderBook::contains_order(uint64_t id) const {
+    return order_lookup.count(id) > 0;
+}
+
 void OrderBook::drain_filled_orders(std::queue<uint64_t> &matched_orders) {
     while(!matched_orders.empty()) {
         uint64_t id = matched_orders.front();
